@@ -177,7 +177,7 @@ in
     # --- Desktop, Waybar e Rofi ---
     kitty
     waybar
-    rofi-wayland     # versão nativa Wayland do launcher
+    rofi     # versão nativa Wayland do launcher
     mako
     hyprpaper
     hyprlock
