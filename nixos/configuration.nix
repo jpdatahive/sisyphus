@@ -13,11 +13,15 @@ in
   
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # Boot
+  # ==========================================================
+  # 1. BOOT E INICIALIZAÇÃO
+  # ==========================================================
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # Rede
+  # ==========================================================
+  # 2. REDE E CONECTIVIDADE
+  # ==========================================================
   networking.hostName = "nixos";
   networking.networkmanager.enable = false;
   networking.wireless.iwd = {
@@ -26,7 +30,9 @@ in
   };
   services.resolved.enable = true; # DNS
   
-  # Fuso horário e idioma
+  # ==========================================================
+  # 3. FUSO HORÁRIO E IDIOMA
+  # ==========================================================
   time.timeZone = "America/Bahia";
   i18n.defaultLocale = "pt_BR.UTF-8";
   i18n.extraLocaleSettings = {
@@ -41,14 +47,18 @@ in
     LC_TIME = "pt_BR.UTF-8";
   };
 
-  # Teclado
+  # ==========================================================
+  # 4. TECLADO
+  # ==========================================================
   services.xserver.xkb = {
     layout = "br";
     variant = "";
   };
   console.keyMap = "br-abnt2";
 
-  # Usuário
+  # ==========================================================
+  # 5. USUÁRIOS
+  # ==========================================================
   users.users."jp" = {
     isNormalUser = true;
     description = "jp";
@@ -58,13 +68,12 @@ in
 
   nixpkgs.config.allowUnfree = true;
 
-  # ---------------- Config JP ----------------
-
-  # Hyprland
+  # ==========================================================
+  # 6. AMBIENTE DESKTOP E LOGIN (HYPRLAND + GREETD)
+  # ==========================================================
   programs.hyprland.enable = true;
   security.polkit.enable = true;
 
-  # Login TTY tuigreet
   services.greetd = {
     enable = true;
     settings.default_session = {
@@ -73,7 +82,9 @@ in
     };
   };
 
-  # Áudio
+  # ==========================================================
+  # 7. SERVIÇOS DO SISTEMA (ÁUDIO, BLUETOOTH, ARQUIVOS)
+  # ==========================================================
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -81,14 +92,19 @@ in
     pulse.enable = true; # necessário para o módulo pulseaudio do Waybar
   };
 
-  # Bluetooth
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
   };
   services.blueman.enable = true;
 
-  # Gráficos: Intel (integrada) + NVIDIA RTX 3050 (offload)
+  # Suporte a lixeira, montagem de pendrives e miniaturas no Nautilus
+  services.gvfs.enable = true;
+  services.tumbler.enable = true;
+
+  # ==========================================================
+  # 8. GRÁFICOS (INTEL INTEGRADA + NVIDIA RTX 3050)
+  # ==========================================================
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -113,13 +129,14 @@ in
     };
   };
 
-  # ASUS e energia
+  # ==========================================================
+  # 9. HARDWARE, ENERGIA E MANUTENÇÃO
+  # ==========================================================
   services.asusd.enable = true;
   services.power-profiles-daemon.enable = true;
   services.upower.enable = true;
   services.thermald.enable = true;
 
-  # Firmware, SSD e memória
   hardware.enableRedistributableFirmware = true;
   services.fwupd.enable = true;
   services.fstrim.enable = true;
@@ -135,45 +152,60 @@ in
     options = "--delete-older-than 14d";
   };
 
-  # Fontes
+  # ==========================================================
+  # 10. FONTES DO SISTEMA
+  # ==========================================================
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
     noto-fonts
     noto-fonts-color-emoji
   ];
 
-  # Pacotes
+  # ==========================================================
+  # 11. PACOTES DO SISTEMA (ENVIRONMENT.SYSTEMPACKAGES)
+  # ==========================================================
   environment.systemPackages = with pkgs; [
+    # --- Base e Ferramentas CLI ---
     git
     neovim
     wget
     curl
     htop
     unzip
+    libnotify        # comando notify-send para notificações dos scripts
 
+    # --- Desktop, Waybar e Rofi ---
     kitty
     waybar
-    rofi 
+    rofi-wayland     # versão nativa Wayland do launcher
     mako
     hyprpaper
     hyprlock
     hypridle
     hyprpolkitagent
+
+    # --- Screenshots, OCR e Gravação de Tela (Omarchy) ---
     wl-clipboard
     grim
     slurp
+    satty            # editor visual de screenshots (setas, texto, blur, crop)
+    tesseract        # motor OCR para extração de texto (Super + Shift + T)
+    wf-recorder      # gravador de tela Wayland (Super + Alt + Print)
+
+    # --- Hardware, Áudio e Visualização de Arquivos ---
     brightnessctl
     playerctl
     pavucontrol
     networkmanagerapplet
     nautilus
+    loupe            # visualizador de imagens moderno do GNOME
     bluetui
     impala
 
+    # --- Navegador e IDE ---
     firefox
     unstable.antigravity # 2.5.5, vem do nixpkgs unstable
   ];
 
   system.stateVersion = "26.05";
 }
-
