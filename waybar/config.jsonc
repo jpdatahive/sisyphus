@@ -1,32 +1,35 @@
 {
   // ==========================================================
-  // 1. BARRA
-  // Posição, altura e quais módulos aparecem em cada lado.
-  // Para mudar a ordem dos ícones, edite as listas abaixo.
+  // 1. BARRA PRINCIPAL
+  // Posição, altura e distribuição dos módulos.
+  // Barra plana e contínua no topo.
   // ==========================================================
   "layer": "top",
   "position": "top",
   "height": 28,
   "modules-left": [
-    "hyprland/workspaces"
+    "hyprland/workspaces",
+    "hyprland/window"
   ],
   "modules-center": [
-    "clock"
+    "clock",
+    "mpris",
+    "custom/screenrecording-indicator"
   ],
   "modules-right": [
-    "tray",
+    "group/tray-expander",
     "bluetooth",
     "network",
     "pulseaudio",
     "cpu",
-    "battery"
+    "memory",
+    "battery",
+    "custom/power"
   ],
+
   // ==========================================================
-  // 2. ÁREAS DE TRABALHO (workspaces)
-  // Mostra os números 1 a 5. O clique para trocar de área já
-  // é nativo do módulo, NÃO coloque "on-click" aqui: ele
-  // intercepta o clique e os botões param de funcionar.
-  // "sort-by-number" mantém a ordem 1, 2, 3, 4, 5.
+  // 2. ÁREAS DE TRABALHO (WORKSPACES)
+  // O clique nativo do módulo troca de área de trabalho.
   // ==========================================================
   "hyprland/workspaces": {
     "format": "{id}",
@@ -35,91 +38,166 @@
       "*": 5
     }
   },
+
   // ==========================================================
-  // 3. RELÓGIO
-  // Dia da semana e hora. Clique para alternar com a data.
+  // 3. JANELA ATIVA (HYPRLAND WINDOW)
+  // ==========================================================
+  "hyprland/window": {
+    "format": "{}",
+    "max-length": 35,
+    "separate-outputs": true
+  },
+
+  // ==========================================================
+  // 4. RELÓGIO E DATA (CLOCK)
   // ==========================================================
   "clock": {
-    "format": "{:%A %H:%M}",
-    "format-alt": "{:%d/%m/%Y}",
+    "format": "󰥔 {:%A %H:%M}",
+    "format-alt": "󰸗 {:%d/%m/%Y}",
     "tooltip": false
   },
+
   // ==========================================================
-  // 4. TRAY (ícones de apps em segundo plano)
-  // "spacing" é o espaço entre os ícones do tray (px).
+  // 5. PLAYER DE MÍDIA (MPRIS)
   // ==========================================================
+  "mpris": {
+    "format": "{player_icon} {title} - {artist}",
+    "format-paused": "{status_icon} <i>{title}</i>",
+    "max-length": 28,
+    "player-icons": {
+      "default": "󰎆",
+      "spotify": "󰓇"
+    },
+    "status-icons": {
+      "paused": "󰏤"
+    }
+  },
+
+  // ==========================================================
+  // 6. INDICADOR DE GRAVAÇÃO DE TELA (OMARCHY STYLE)
+  // ==========================================================
+  "custom/screenrecording-indicator": {
+    "exec": "if [ -f /tmp/omarchy_recording.pid ]; then echo '{\"text\":\"⏺ Gravando\",\"class\":\"active\",\"tooltip\":\"Clique para parar a gravação\"}'; else echo ''; fi",
+    "return-type": "json",
+    "signal": 8,
+    "interval": 2,
+    "on-click": "/home/jp/.config/hypr/scripts/screenshot.sh record-toggle"
+  },
+
+  // ==========================================================
+  // 7. GAVETA RETRÁTIL DO TRAY (GROUP/TRAY-EXPANDER)
+  // Esconde os ícones do tray atrás de um botão expansível.
+  // ==========================================================
+  "group/tray-expander": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": 400,
+      "children-class": "tray-child"
+    },
+    "modules": [
+      "custom/tray-icon",
+      "tray"
+    ]
+  },
+  "custom/tray-icon": {
+    "format": "󱊖",
+    "tooltip": false
+  },
   "tray": {
     "icon-size": 14,
-    "spacing": 12
+    "spacing": 10
   },
+
   // ==========================================================
-  // 5. BLUETOOTH
-  // Ícone com número de dispositivos conectados.
-  // Clique abre o bluetui.
+  // 8. BLUETOOTH
   // ==========================================================
   "bluetooth": {
-    "format": "\uf293",
-    "format-disabled": "\uf293 off",
-    "format-connected": "\uf293 {num_connections}",
-    "tooltip-format": "{status}",
+    "format": "󰂯",
+    "format-disabled": "󰂲 off",
+    "format-connected": "󰂱 {num_connections}",
+    "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} conectado(s)",
     "on-click": "kitty --class bluetui -e bluetui"
   },
+
   // ==========================================================
-  // 6. REDE
-  // Ícone de Wi-Fi, cabo ou desconectado.
-  // Clique abre o impala (gerenciador do iwd).
+  // 9. REDE (NETWORK)
   // ==========================================================
   "network": {
-    "format-wifi": "\uf1eb",
-    "format-ethernet": "\uf0e8",
-    "format-disconnected": "\uf071",
+    "format-wifi": "󰤨 {signalStrength}%",
+    "format-ethernet": "󰈀 cabo",
+    "format-disconnected": "󰤭 off",
     "tooltip-format-wifi": "{essid} ({signalStrength}%)",
     "on-click": "kitty --class impala -e impala"
   },
+
   // ==========================================================
-  // 7. ÁUDIO
-  // Ícone de volume. Clique abre o pavucontrol,
-  // rolar o mouse muda o volume de 5 em 5.
+  // 10. ÁUDIO (PULSEAUDIO)
   // ==========================================================
   "pulseaudio": {
-    "format": "{icon}",
-    "format-muted": "\uf026",
+    "format": "{icon} {volume}%",
+    "format-muted": "󰝟 mute",
     "format-icons": {
       "default": [
-        "\uf027",
-        "\uf028"
+        "󰕿",
+        "󰖀",
+        "󰕾"
       ]
     },
     "tooltip-format": "{volume}%",
     "on-click": "pavucontrol",
     "scroll-step": 5
   },
+
   // ==========================================================
-  // 8. CPU
-  // Ícone de CPU. Clique abre o htop.
+  // 11. PROCESSADOR (CPU)
   // ==========================================================
   "cpu": {
-    "format": "\uf2db",
-    "interval": 5,
+    "format": "󰍛 {usage}%",
+    "interval": 3,
     "on-click": "kitty -e htop"
   },
+
   // ==========================================================
-  // 9. BATERIA
-  // Ícone + porcentagem. "states" define os níveis
-  // de aviso (25%) e crítico (10%) usados no CSS.
+  // 12. MEMÓRIA RAM (MEMORY)
+  // ==========================================================
+  "memory": {
+    "format": "󰘚 {percentage}%",
+    "interval": 5,
+    "tooltip-format": "RAM: {used:0.1f}GB / {total:0.1f}GB",
+    "on-click": "kitty -e htop"
+  },
+
+  // ==========================================================
+  // 13. BATERIA
   // ==========================================================
   "battery": {
     "format": "{icon} {capacity}%",
+    "format-charging": "󰂄 {capacity}%",
+    "format-plugged": "󰚥 {capacity}%",
     "format-icons": [
-      "\uf244",
-      "\uf243",
-      "\uf242",
-      "\uf241",
-      "\uf240"
+      "󰁺",
+      "󰁻",
+      "󰁼",
+      "󰁽",
+      "󰁾",
+      "󰁿",
+      "󰂀",
+      "󰂁",
+      "󰂂",
+      "󰁹"
     ],
     "states": {
       "warning": 25,
       "critical": 10
     }
+  },
+
+  // ==========================================================
+  // 14. MENU DE ENERGIA / SAÍDA (CUSTOM/POWER)
+  // ==========================================================
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": false,
+    "on-click": "rofi -show drun"
   }
 }
