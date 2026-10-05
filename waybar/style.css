@@ -1,0 +1,77 @@
+/* ==========================================================
+   1. BASE
+   Fonte, tamanho e reset aplicados a todos os elementos.
+   ========================================================== */
+* {
+  font-family: "JetBrainsMono Nerd Font";
+  font-size: 12px;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+}
+
+/* ==========================================================
+   2. BARRA
+   Cor de fundo e de texto da barra inteira.
+   ========================================================== */
+window#waybar {
+  background: rgba(30, 30, 46, 0.9);
+  color: #cdd6f4;
+}
+
+/* ==========================================================
+   3. MARGENS DAS BORDAS
+   Espaço entre as extremidades da tela e os módulos
+   da esquerda e da direita.
+   ========================================================== */
+.modules-left {
+  margin-left: 8px;
+}
+
+.modules-right {
+  margin-right: 8px;
+}
+
+/* ==========================================================
+   4. ÁREAS DE TRABALHO (números)
+   Cada número é um botão clicável que troca de área.
+   - padding: aumenta a área de clique em volta do número
+   - margin: espaço entre um número e outro
+   - color: cinza = inativa, azul = ativa
+   ========================================================== */
+#workspaces button {
+  background: transparent;
+  box-shadow: none;
+  text-shadow: none;
+  padding: 0 8px;
+  margin: 0 2px;
+  min-width: 12px;
+  color: #6c7086;
+}
+
+/* Área ativa (a que você está usando) */
+#workspaces button.active {
+  color: #89b4fa;
+}
+
+/* Efeito ao passar o mouse, indica que é clicável */
+#workspaces button:hover {
+  background: rgba(137, 180, 250, 0.15);
+  color: #cdd6f4;
+}
+
+/* ==========================================================
+   5. ESPAÇAMENTO DOS ÍCONES DA DIREITA
+   Controla a distância entre tray, bluetooth, rede, áudio,
+   CPU e bateria. Para ajustar, mude o segundo valor de
+   "margin" (antes era 7px, agora 10px).
+   ========================================================== */
+#cpu,
+#battery,
+#pulseaudio,
+#network,
+#bluetooth,
+#tray {
+  min-width: 12px;
+  margin: 0 10px;
+}

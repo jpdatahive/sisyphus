@@ -1,0 +1,9 @@
+# Backups e temporários
+*.bak
+*~
+*.swp
+*.swo
+
+# NixOS build results
+result
+result-*
