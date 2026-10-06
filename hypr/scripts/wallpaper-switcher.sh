@@ -104,7 +104,7 @@ case "$1" in
         ;;
 
     *)
-        # Modo Interativo via Rofi
+        # Modo Interativo via Rofi com Miniaturas em Grade (Galeria)
         DISPLAY_ITEMS=""
         for wp in "${WALLPAPERS[@]}"; do
             bname="${wp##*/}"
@@ -112,14 +112,14 @@ case "$1" in
             clean_name="${no_ext#[0-9][0-9][-_]}"
             clean_name="${clean_name#[0-9][-_]}"
             clean_name="${clean_name//[-_]/ }"
-            DISPLAY_ITEMS+="$bname  (${clean_name^})"$'\n'
+            DISPLAY_ITEMS+="${bname} :: ${clean_name^}"$'\0icon\x1f'"${wp}"$'\n'
         done
 
-        SELECTED=$(printf "%s" "$DISPLAY_ITEMS" | sed '/^$/d' | rofi -dmenu -i -p "Wallpapers ($CURRENT_THEME)" -theme-str 'window { width: 550px; }')
+        SELECTED=$(printf "%b" "$DISPLAY_ITEMS" | rofi -dmenu -i -p "Wallpapers ($CURRENT_THEME)" -theme-str 'window { width: 880px; } listview { columns: 3; lines: 3; spacing: 12px; } element { orientation: vertical; padding: 12px; border-radius: 10px; } element-icon { size: 120px; border-radius: 8px; horizontal-align: 0.5; } element-text { horizontal-align: 0.5; font: "JetBrainsMono Nerd Font 9"; }')
         
         [ -z "$SELECTED" ] && exit 0
 
-        SELECTED_FILE=$(awk '{print $1}' <<< "$SELECTED")
+        SELECTED_FILE="${SELECTED%% :: *}"
         TARGET_PATH="$THEME_BG_DIR/$SELECTED_FILE"
 
         if [ -f "$TARGET_PATH" ]; then

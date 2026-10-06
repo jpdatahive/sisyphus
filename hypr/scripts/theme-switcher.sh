@@ -17,18 +17,30 @@ notify() {
 }
 
 # ==========================================================
-# 2. SELEÇÃO DO TEMA (CLI OU MENU ROFI)
+# 2. SELEÇÃO DO TEMA (CLI OU MENU ROFI COM PREVIEWS)
 # ==========================================================
 if [ -n "$1" ]; then
     CHOSEN_NAME="$1"
 else
-    # Lista as pastas disponíveis em ~/.config/themes
-    THEME_LIST=$(find -L "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' 2>/dev/null | sort)
-    if [ -z "$THEME_LIST" ]; then
+    # Lista as pastas disponíveis em ~/.config/themes com seus preview.png
+    THEME_ITEMS=""
+    while IFS= read -r dir; do
+        [ -d "$dir" ] || continue
+        name="${dir##*/}"
+        preview="$dir/preview.png"
+        if [ -f "$preview" ]; then
+            THEME_ITEMS+="${name}"$'\0icon\x1f'"${preview}"$'\n'
+        else
+            THEME_ITEMS+="${name}"$'\n'
+        fi
+    done < <(find -L "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+
+    if [ -z "$THEME_ITEMS" ]; then
         notify "Erro de Tema" "Nenhum tema encontrado em $THEMES_DIR"
         exit 1
     fi
-    CHOSEN_NAME=$(echo "$THEME_LIST" | rofi -dmenu -i -p "Selecionar Tema" -theme-str 'window { width: 450px; }')
+
+    CHOSEN_NAME=$(printf "%b" "$THEME_ITEMS" | rofi -dmenu -i -p "Selecionar Tema" -theme-str 'window { width: 750px; } listview { columns: 2; lines: 6; spacing: 8px; } element { padding: 8px 12px; } element-icon { size: 48px; border-radius: 6px; }')
 fi
 
 [ -z "$CHOSEN_NAME" ] && exit 0
