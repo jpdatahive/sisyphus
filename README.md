@@ -1,8 +1,8 @@
-# Sisyphus 🪨
+# Sisyphus
 
 > Dotfiles pessoais para **NixOS** com **Hyprland**, **Waybar**, **Rofi** e ferramentas associadas.
 
-## 📂 Estrutura do Repositório
+## Estrutura do Repositório
 
 ```text
 sisyphus/
@@ -18,7 +18,7 @@ sisyphus/
     └── hardware-configuration.nix # Mapeamento de hardware/discos
 ```
 
-## 🚀 Como Aplicar
+## Como Aplicar
 
 ### Configurações de Usuário (~/.config)
 Para vincular com links simbólicos:

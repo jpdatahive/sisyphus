@@ -77,7 +77,7 @@
   // 6. INDICADOR DE GRAVAÇÃO DE TELA (OMARCHY STYLE)
   // ==========================================================
   "custom/screenrecording-indicator": {
-    "exec": "if [ -f /tmp/omarchy_recording.pid ]; then echo '{\"text\":\"⏺ Gravando\",\"class\":\"active\",\"tooltip\":\"Clique para parar a gravação\"}'; else echo ''; fi",
+    "exec": "if [ -f /tmp/omarchy_recording.pid ]; then echo '{\"text\":\" Gravando\",\"class\":\"active\",\"tooltip\":\"Clique para parar a gravação\"}'; else echo ''; fi",
     "return-type": "json",
     "signal": 8,
     "interval": 2,
@@ -196,7 +196,7 @@
   // 14. MENU DE ENERGIA / SAÍDA (CUSTOM/POWER)
   // ==========================================================
   "custom/power": {
-    "format": "⏻",
+    "format": "",
     "tooltip": false,
     "on-click": "rofi -show drun"
   }
