@@ -188,6 +188,8 @@ in
     hyprlock
     hypridle
     hyprpolkitagent
+    cliphist         # gerenciador de histórico da área de transferência
+    bc               # motor aritmético para scripts e calculadora
 
     # --- Screenshots, OCR e Gravação de Tela (Omarchy) ---
     wl-clipboard
