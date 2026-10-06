@@ -4,9 +4,6 @@
 # ==========================================================
 
 DIR="$HOME/Images/Screenshots"
-mkdir -p "$DIR"
-TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
-FILENAME="$DIR/screenshot_${TIMESTAMP}.png"
 RECORDING_PID_FILE="/tmp/omarchy_recording.pid"
 
 notify() {
@@ -15,15 +12,23 @@ notify() {
     fi
 }
 
+get_filename() {
+    mkdir -p "$DIR"
+    local timestamp
+    timestamp=$(date +'%Y%m%d_%H%M%S')
+    echo "$DIR/screenshot_${timestamp}.png"
+}
+
 case "$1" in
     # ------------------------------------------------------
     # 1. MODO INTERATIVO (EDITOR SATTY / SELEÇÃO INTELIGENTE)
     # ------------------------------------------------------
     interactive)
-        pkill slurp && exit 0
+        pkill -x slurp 2>/dev/null && exit 0
         SELECTION=$(slurp 2>/dev/null)
         [ -z "$SELECTION" ] && exit 0
 
+        FILENAME=$(get_filename)
         if command -v satty >/dev/null 2>&1; then
             grim -g "$SELECTION" - | satty --filename - --output-filename "$FILENAME" --early-exit --actions-on-enter save-to-clipboard --copy-command 'wl-copy'
         elif command -v swappy >/dev/null 2>&1; then
@@ -38,6 +43,7 @@ case "$1" in
     # 2. MODO TELA CHEIA (SALVAR DIRETO E COPIAR)
     # ------------------------------------------------------
     full)
+        FILENAME=$(get_filename)
         grim "$FILENAME" && wl-copy < "$FILENAME"
         notify "Screenshot Capturado" "Tela cheia salva em: $FILENAME" "$FILENAME"
         ;;
@@ -48,22 +54,32 @@ case "$1" in
     record-toggle)
         if [ -f "$RECORDING_PID_FILE" ]; then
             REC_PID=$(cat "$RECORDING_PID_FILE")
-            kill -INT "$REC_PID" 2>/dev/null
-            rm -f "$RECORDING_PID_FILE"
-            pkill -RTMIN+8 waybar 2>/dev/null
-            notify "Gravação Finalizada" "Vídeo salvo na pasta de capturas."
-        else
-            SELECTION=$(slurp 2>/dev/null)
-            [ -z "$SELECTION" ] && exit 0
-            REC_FILE="$DIR/recording_${TIMESTAMP}.mp4"
-            if command -v wf-recorder >/dev/null 2>&1; then
-                wf-recorder -g "$SELECTION" -f "$REC_FILE" &
-                echo $! > "$RECORDING_PID_FILE"
-                pkill -RTMIN+8 waybar 2>/dev/null
-                notify "Gravação Iniciada" "Gravando área selecionada..."
-            else
-                notify "Erro na Gravação" "wf-recorder não encontrado no sistema."
+            if [ -n "$REC_PID" ] && kill -0 "$REC_PID" 2>/dev/null; then
+                kill -INT "$REC_PID" 2>/dev/null
+                rm -f "$RECORDING_PID_FILE"
+                pkill -RTMIN+8 -x waybar 2>/dev/null
+                notify "Gravação Finalizada" "Vídeo salvo na pasta de capturas."
+                exit 0
             fi
+            # Limpa PID órfão se o processo não estiver mais ativo
+            rm -f "$RECORDING_PID_FILE"
+        fi
+
+        pkill -x slurp 2>/dev/null && exit 0
+        SELECTION=$(slurp 2>/dev/null)
+        [ -z "$SELECTION" ] && exit 0
+
+        mkdir -p "$DIR"
+        TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
+        REC_FILE="$DIR/recording_${TIMESTAMP}.mp4"
+
+        if command -v wf-recorder >/dev/null 2>&1; then
+            wf-recorder -g "$SELECTION" -f "$REC_FILE" &
+            echo $! > "$RECORDING_PID_FILE"
+            pkill -RTMIN+8 -x waybar 2>/dev/null
+            notify "Gravação Iniciada" "Gravando área selecionada..."
+        else
+            notify "Erro na Gravação" "wf-recorder não encontrado no sistema."
         fi
         ;;
 
