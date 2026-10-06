@@ -198,6 +198,6 @@
   "custom/power": {
     "format": "",
     "tooltip": false,
-    "on-click": "rofi -show drun"
+    "on-click": "/home/jp/.config/hypr/scripts/power-menu.sh"
   }
 }
