@@ -231,19 +231,18 @@ echo "$CHOSEN_NAME" > "$CURRENT_THEME_FILE"
 # 5. RECARGA DOS COMPONENTES EM PARALELO (INSTANTÂNEO)
 # ==========================================================
 
-# Kitty (SIGUSR1 recarrega configurações sem reiniciar)
-pkill -USR1 -x kitty 2>/dev/null &
+# Kitty (SIGUSR1 recarrega configurações sem reiniciar - cobre wrapper NixOS)
+(pkill -USR1 -x kitty 2>/dev/null; pkill -USR1 -x .kitty-wrapped 2>/dev/null) &
 
-# Waybar (SIGUSR2 recarrega folhas de estilo CSS)
-pkill -USR2 -x waybar 2>/dev/null &
+# Waybar (SIGUSR2 recarrega folhas de estilo CSS - cobre wrapper NixOS)
+(pkill -USR2 -x waybar 2>/dev/null; pkill -USR2 -x .waybar-wrapped 2>/dev/null) &
 
 # Mako
 makoctl reload 2>/dev/null &
 
-# Bordas do Hyprland via IPC keyword
+# Bordas do Hyprland via Lua IPC eval (obrigatório com backend Lua no Hyprland 0.55+)
 if command -v hyprctl >/dev/null 2>&1; then
-    hyprctl keyword general:col.active_border "rgba(${ACCENT_HEX}ee) rgba(${C5_HEX}ee) 45deg" >/dev/null 2>&1 &
-    hyprctl keyword general:col.inactive_border "rgba(${C0_HEX}aa)" >/dev/null 2>&1 &
+    hyprctl eval "hl.config({ general = { col = { active_border = { colors = {'rgba(${ACCENT_HEX}ee)', 'rgba(${C5_HEX}ee)'}, angle = 45 }, inactive_border = 'rgba(${C0_HEX}aa)' } } })" >/dev/null 2>&1 &
 fi
 
 # Wallpaper via hyprpaper IPC (sem matar ou reiniciar processo se já estiver rodando)
@@ -252,6 +251,32 @@ if [ -n "$WALLPAPER" ]; then
         hyprctl hyprpaper wallpaper ",$WALLPAPER,cover" >/dev/null 2>&1 &
     else
         hyprpaper >/dev/null 2>&1 &
+    fi
+fi
+
+# Integração GNOME / GTK (Modo Claro/Escuro e Ícones do Tema)
+if command -v gsettings >/dev/null 2>&1; then
+    if [ -f "$THEME_DIR/light.mode" ]; then
+        gsettings set org.gnome.desktop.interface color-scheme "prefer-light" 2>/dev/null &
+        gsettings set org.gnome.desktop.interface gtk-theme "Adwaita" 2>/dev/null &
+    else
+        gsettings set org.gnome.desktop.interface color-scheme "prefer-dark" 2>/dev/null &
+        gsettings set org.gnome.desktop.interface gtk-theme "Adwaita-dark" 2>/dev/null &
+    fi
+
+    if [ -f "$THEME_DIR/icons.theme" ]; then
+        ICON_THEME=$(head -n 1 "$THEME_DIR/icons.theme")
+        [ -n "$ICON_THEME" ] && gsettings set org.gnome.desktop.interface icon-theme "$ICON_THEME" 2>/dev/null &
+    fi
+fi
+
+# Teclado ASUS ROG (se compatível via asusd / asusctl)
+if command -v asusctl >/dev/null 2>&1; then
+    if [ -f "$THEME_DIR/keyboard.rgb" ]; then
+        KB_RGB=$(sed 's/^#//' "$THEME_DIR/keyboard.rgb")
+        asusctl aura effect static -c "$KB_RGB" >/dev/null 2>&1 &
+    else
+        asusctl aura effect static -c "$ACCENT_HEX" >/dev/null 2>&1 &
     fi
 fi
 

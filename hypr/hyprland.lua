@@ -1,5 +1,5 @@
 -- ==========================================================
--- HYPRLAND CONFIGURATION (LUA) - COM RECURSOS OMARCHY 3
+-- HYPRLAND CONFIGURATION (LUA) - AMBIENTE DE TRABALHO PERSONALIZADO
 -- ==========================================================
 
 -- ==========================================================
@@ -177,8 +177,14 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 -- Guia de Atalhos Interativo (Rofi): Super + K
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/keybindings-menu.sh"))
 
--- Alternador de Temas e Wallpapers: Super + Ctrl + Space
+-- Alternador de Temas: Super + Ctrl + Space
 hl.bind(mainMod .. " + CONTROL + SPACE", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/theme-switcher.sh"))
+
+-- Menu de Papéis de Parede do Tema (Rofi): Super + Alt + Space
+hl.bind(mainMod .. " + ALT + SPACE", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/wallpaper-switcher.sh"))
+
+-- Próximo Papel de Parede (Ciclar Rápido): Super + Alt + W
+hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/wallpaper-switcher.sh next"))
 
 -- ----------------------------------------------------------
 -- 10.2 CONTROLE DE JANELAS E TILING AVANÇADO
@@ -195,7 +201,7 @@ hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 -- Alternar divisão (Dwindle split): Super + J
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 
--- Agrupar Janelas em Abas (Estilo Omarchy): Super + G
+-- Agrupar Janelas em Abas: Super + G
 hl.bind(mainMod .. " + G", hl.dsp.layout("togglegroup"))
 
 -- Navegar entre Abas de um Grupo: Super + Alt + Tab
@@ -208,7 +214,7 @@ hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.exec_cmd("pkill -SIGUSR1 waybar ||
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
 
 -- ----------------------------------------------------------
--- 10.3 CAPTURAS DE TELA, GRAVAÇÃO E OCR (OMARCHY 3)
+-- 10.3 CAPTURAS DE TELA, GRAVAÇÃO E OCR
 -- ----------------------------------------------------------
 -- Screenshot Interativo (Editor Satty com setas/corte/blur): Super + Ctrl + S
 hl.bind(mainMod .. " + CONTROL + S", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/screenshot.sh interactive"))
@@ -311,15 +317,21 @@ hl.window_rule({
     no_focus = true,
 })
 
--- Janelas flutuantes automáticas para utilitários
-hl.window_rule({
-    name  = "float-bluetui",
-    match = { class = "bluetui" },
-    float = true,
-})
+-- Janelas utilitárias da Waybar: centralizadas, flutuantes e ocupando no máx. metade da tela
+local waybarPopups = {
+    "bluetui",
+    "impala",
+    "htop",
+    "pavucontrol",
+    "org.pulseaudio.pavucontrol",
+}
 
-hl.window_rule({
-    name  = "float-impala",
-    match = { class = "impala" },
-    float = true,
-})
+for _, cls in ipairs(waybarPopups) do
+    hl.window_rule({
+        name   = "waybar-popup-" .. cls,
+        match  = { class = "^(" .. cls .. ")$" },
+        float  = true,
+        center = true,
+        size   = "48% 48%",
+    })
+end
