@@ -133,9 +133,14 @@ in
   # 9. HARDWARE, ENERGIA E MANUTENÇÃO
   # ==========================================================
   services.asusd.enable = true;
-  services.power-profiles-daemon.enable = true;
+  services.power-profiles-daemon.enable = false; # desativado para evitar conflito com os perfis do asusd
   services.upower.enable = true;
   services.thermald.enable = true;
+
+  # Garante a criação da pasta /etc/asusd exigida pelo asusd.service
+  systemd.tmpfiles.rules = [
+    "d /etc/asusd 0755 root root -"
+  ];
 
   hardware.enableRedistributableFirmware = true;
   services.fwupd.enable = true;
