@@ -26,6 +26,7 @@ hl.on("hyprland.start", function ()
     hl.exec_cmd(terminal)
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("mako & waybar & hyprpaper & firefox")
+    hl.exec_cmd("wl-paste --watch cliphist store &")
 end)
 
 -- ==========================================================
@@ -163,7 +164,8 @@ hl.gesture({
 local mainMod = "SUPER"
 
 -- ----------------------------------------------------------
--- 10.1 APLICATIVOS BÁSICOS
+-- ----------------------------------------------------------
+-- 10.1 APLICATIVOS BÁSICOS E MENUS ROFI
 -- ----------------------------------------------------------
 -- Terminal Kitty: Super + Enter
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
@@ -171,20 +173,38 @@ hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd(terminal))
 -- Menu de Aplicativos Rofi: Super + Space
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(menu))
 
+-- Alternar Janelas Abertas (Rofi Window): Super + Tab
+hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("rofi -show window"))
+
 -- Gerenciador de Arquivos: Super + E
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 
 -- Guia de Atalhos Interativo (Rofi): Super + K
 hl.bind(mainMod .. " + K", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/keybindings-menu.sh"))
 
--- Alternador de Temas: Super + Ctrl + Space
+-- Alternador de Temas com Miniaturas: Super + Ctrl + Space
 hl.bind(mainMod .. " + CONTROL + SPACE", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/theme-switcher.sh"))
 
--- Menu de Papéis de Parede do Tema (Rofi): Super + Alt + Space
+-- Galeria Visual de Wallpapers do Tema: Super + Alt + Space
 hl.bind(mainMod .. " + ALT + SPACE", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/wallpaper-switcher.sh"))
 
 -- Próximo Papel de Parede (Ciclar Rápido): Super + Alt + W
 hl.bind(mainMod .. " + ALT + W", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/wallpaper-switcher.sh next"))
+
+-- Histórico da Área de Transferência (Clipboard): Super + Shift + V
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/clipboard-menu.sh"))
+
+-- Perfis de Energia e Ventoinha (ASUS ROG): Super + Shift + P
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/power-profile.sh"))
+
+-- Seletor Interativo de Saídas/Entradas de Áudio: Super + Shift + A
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/audio-menu.sh"))
+
+-- Seletor de Emojis e Símbolos Nerd Font: Super + .
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/emoji-menu.sh"))
+
+-- Calculadora Rápida: Super + =
+hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/calc-menu.sh"))
 
 -- ----------------------------------------------------------
 -- 10.2 CONTROLE DE JANELAS E TILING AVANÇADO
@@ -210,8 +230,9 @@ hl.bind(mainMod .. " + ALT + Tab", hl.dsp.layout("changegroupactive"))
 -- Ocultar / Exibir Barra Waybar: Super + Shift + Space
 hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.exec_cmd("pkill -SIGUSR1 waybar || waybar &"))
 
--- Sair / Desligar: Super + M
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("command -v hyprshutdown >/dev/null 2>&1 && hyprshutdown || hyprctl dispatch 'hl.dsp.exit()'"))
+-- Menu de Sessão e Energia (Power Menu): Super + Escape e Super + M
+hl.bind(mainMod .. " + Escape", hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/power-menu.sh"))
+hl.bind(mainMod .. " + M",      hl.dsp.exec_cmd("/home/jp/.config/hypr/scripts/power-menu.sh"))
 
 -- ----------------------------------------------------------
 -- 10.3 CAPTURAS DE TELA, GRAVAÇÃO E OCR
