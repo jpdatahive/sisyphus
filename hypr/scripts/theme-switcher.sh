@@ -22,27 +22,37 @@ notify() {
 if [ -n "$1" ]; then
     CHOSEN_NAME="$1"
 else
-    # Lista as pastas disponíveis em ~/.config/themes com seus preview.png
-    THEME_ITEMS=""
-    while IFS= read -r dir; do
-        [ -d "$dir" ] || continue
-        name="${dir##*/}"
-        preview="$dir/preview.png"
-        if [ -f "$preview" ]; then
-            THEME_ITEMS+="${name}"$'\0icon\x1f'"${preview}"$'\n'
-        else
-            THEME_ITEMS+="${name}"$'\n'
-        fi
-    done < <(find -L "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
-
-    if [ -z "$THEME_ITEMS" ]; then
+    # Verifica se existem temas disponíveis antes de abrir o Rofi
+    if ! find -L "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -q .; then
         notify "Erro de Tema" "Nenhum tema encontrado em $THEMES_DIR"
         exit 1
     fi
 
-    CHOSEN_NAME=$(printf "%b" "$THEME_ITEMS" | rofi -dmenu -i -p "Selecionar Tema" -theme-str 'window { width: 750px; } listview { columns: 2; lines: 6; spacing: 8px; } element { padding: 8px 12px; } element-icon { size: 48px; border-radius: 6px; }')
+    # Identifica o tema atual para exibição de indicador
+    CURRENT_THEME=""
+    [ -f "$CURRENT_THEME_FILE" ] && CURRENT_THEME=$(head -n 1 "$CURRENT_THEME_FILE")
+
+    # Função para gerar a lista de temas formatada para o Rofi com ícones/miniaturas
+    generate_theme_items() {
+        while IFS= read -r dir; do
+            [ -d "$dir" ] || continue
+            local name="${dir##*/}"
+            local preview="$dir/preview.png"
+            local suffix=""
+            [ "$name" = "$CURRENT_THEME" ] && suffix="  ● (ativo)"
+            if [ -f "$preview" ]; then
+                printf "%s%s\0icon\x1f%s\n" "$name" "$suffix" "$preview"
+            else
+                printf "%s%s\n" "$name" "$suffix"
+            fi
+        done < <(find -L "$THEMES_DIR" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | sort)
+    }
+
+    CHOSEN_NAME=$(generate_theme_items | rofi -dmenu -i -p "Selecionar Tema" -theme-str 'window { width: 700px; } listview { columns: 1; lines: 5; spacing: 8px; } element { padding: 8px 16px; spacing: 20px; border-radius: 10px; } element-icon { size: 90px; border-radius: 8px; } element-text { font: "JetBrainsMono Nerd Font Bold 13"; vertical-align: 0.5; }')
 fi
 
+CHOSEN_NAME="${CHOSEN_NAME%$'\r'}"
+CHOSEN_NAME="${CHOSEN_NAME%% *}"
 [ -z "$CHOSEN_NAME" ] && exit 0
 
 THEME_DIR="$THEMES_DIR/$CHOSEN_NAME"
